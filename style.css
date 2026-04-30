@@ -1090,27 +1090,91 @@ button {
     border-radius: var(--radius-lg);
 }
 
+.ingredient-item {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.ingredient-item:last-child {
+    border-bottom: none;
+}
+
+.ing-amount {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.shopping-name {
+    font-weight: 600;
+}
+
+.shopping-detail {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+}
+
+.shopping-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0.8rem 0;
+    border-bottom: 2px solid var(--border-color);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
 .shopping-item {
     padding: 1rem 0;
     border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
     align-items: center;
     font-size: 1.1rem;
 }
 
-.item-count {
-    background: var(--primary);
-    color: white;
-    font-size: 0.75rem;
+.shopping-qty-cell {
+    color: var(--text-muted);
+    font-size: 1rem;
+}
+
+.shopping-qty {
     font-weight: 600;
-    padding: 0.2rem 0.5rem;
-    border-radius: 20px;
+    color: var(--text-main);
+}
+
+.shopping-name {
+    font-weight: 600;
+}
+
+.shopping-detail {
+    color: var(--text-muted);
+    font-size: 0.85rem;
     margin-left: 0.5rem;
+}
+
+.recipe-count-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-top: 0.15rem;
 }
 
 .shopping-item:last-child {
     border-bottom: none;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    opacity: 0.7;
 }
 
 /* Tag Manager */

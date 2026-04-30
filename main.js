@@ -72,3 +72,13 @@ function shareRecipe(recipe) {
         alert('La función de compartir no está disponible en este navegador.');
     }
 }
+
+function renderIngredientLine(text) {
+    if (!text) return '';
+    const parts = text.split('|').map(p => p.trim());
+    if (parts.length >= 2 && parts[0]) {
+        if (parts[2]) return `${parts[0]} <span class="ing-amount">${parts[1]} ${parts[2]}</span>`;
+        return `${parts[0]} <span class="ing-amount">${parts[1]}</span>`;
+    }
+    return text;
+}

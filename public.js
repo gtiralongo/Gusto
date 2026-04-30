@@ -242,7 +242,7 @@ function viewPublicRecipe(id) {
 
                 <div class="detail-section">
                     <h3 class="detail-section-title">Ingredientes</h3>
-                    <div class="detail-ingredients">${recipe.ingredients.replace(/\n/g, '<br>')}</div>
+                    <div class="detail-ingredients">${(recipe.ingredients || '').split('\n').filter(l => l.trim()).map(l => `<div class="ingredient-item">${renderIngredientLine(l)}</div>`).join('')}</div>
                 </div>
 
                 <div class="detail-section">

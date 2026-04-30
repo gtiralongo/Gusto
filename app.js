@@ -537,14 +537,69 @@ function setupEventListeners() {
 
 function checkAuth() { return isLoggedIn; }
 
+function validateIngredients(text) {
+    const lines = text.split('\n').filter(l => l.trim());
+    const errors = [];
+    lines.forEach((line, i) => {
+        const parts = line.split('|');
+        if (parts.length < 2 || parts.length > 3) {
+            errors.push(`Línea ${i + 1}: "${line.trim()}" → Formato: ingrediente|cantidad|unidad`);
+        } else if (!parts[0].trim()) {
+            errors.push(`Línea ${i + 1}: El nombre del ingrediente está vacío`);
+        } else if (!parts[1].trim()) {
+            errors.push(`Línea ${i + 1}: La cantidad está vacía`);
+        }
+    });
+    return errors;
+}
+
+function parseIngredients(text) {
+    return text.split('\n').filter(l => l.trim()).map(line => {
+        const parts = line.split('|').map(p => p.trim());
+        return {
+            name: parts[0],
+            cantidad: parts[1] || '',
+            unidad: parts[2] || ''
+        };
+    });
+}
+
+function formatIngredients(ingredients) {
+    if (typeof ingredients !== 'string') return ingredients;
+    if (ingredients.includes('|')) {
+        return parseIngredients(ingredients);
+    }
+    return ingredients;
+}
+
+function renderIngredientLine(ing) {
+    if (typeof ing === 'string') {
+        const parts = ing.split('|').map(p => p.trim());
+        if (parts.length >= 2 && parts[0]) {
+            if (parts[2]) return `${parts[0]} — ${parts[1]} ${parts[2]}`;
+            return `${parts[0]} — ${parts[1]}`;
+        }
+        return ing;
+    }
+    if (ing.cantidad && ing.unidad) return `${ing.name} — ${ing.cantidad} ${ing.unidad}`;
+    if (ing.cantidad) return `${ing.name} — ${ing.cantidad}`;
+    return ing.name;
+}
+
 function saveRecipe() {
     const name = document.getElementById('recipe-name').value;
-    const ingredients = document.getElementById('recipe-ingredients').value;
+    const ingredientsRaw = document.getElementById('recipe-ingredients').value;
     const steps = document.getElementById('recipe-steps').value;
     const video = document.getElementById('recipe-video').value;
     const image = document.getElementById('recipe-image').value || `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800`;
     const time = parseInt(document.getElementById('recipe-time').value) || 30;
     const difficulty = document.getElementById('recipe-difficulty').value;
+
+    const errors = validateIngredients(ingredientsRaw);
+    if (errors.length > 0) {
+        showToast(errors[0], 'error');
+        return;
+    }
 
     const tags = Array.from(document.querySelectorAll('.form-tag-item.selected'))
                      .map(el => el.dataset.tag);
@@ -553,11 +608,11 @@ function saveRecipe() {
 
     if (editingRecipeId) {
         const index = recipes.findIndex(r => r.id === editingRecipeId);
-        recipes[index] = { ...recipes[index], name, tags, ingredients, steps, video, image, time, difficulty, isPublic };
+        recipes[index] = { ...recipes[index], name, tags, ingredients: ingredientsRaw, steps, video, image, time, difficulty, isPublic };
     } else {
         const newRecipe = {
             id: Date.now(),
-            name, tags, ingredients, steps, video, image, time, difficulty,
+            name, tags, ingredients: ingredientsRaw, steps, video, image, time, difficulty,
             isFavorite: false,
             isPublic: isPublic
         };
@@ -618,6 +673,7 @@ function viewRecipe(id) {
     const detailsContainer = document.getElementById('recipe-details');
     const embedUrl = getYoutubeEmbedUrl(recipe.video);
     const tagsHtml = (recipe.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
+    const ingredientsHtml = (recipe.ingredients || '').split('\n').filter(l => l.trim()).map(l => `<div class="ingredient-item">${renderIngredientLine(l)}</div>`).join('');
 
     detailsContainer.innerHTML = `
         <div class="detail-body">
@@ -638,7 +694,7 @@ function viewRecipe(id) {
 
                 <div class="detail-section">
                     <h3 class="detail-section-title">Ingredientes</h3>
-                    <div class="detail-ingredients">${recipe.ingredients.replace(/\n/g, '<br>')}</div>
+                    <div class="detail-ingredients">${ingredientsHtml}</div>
                 </div>
 
                 <div class="detail-section">
@@ -882,31 +938,91 @@ function savePlannerData() {
 
 function renderShoppingList() {
     shoppingContent.innerHTML = '';
-    const ingredientCounts = {};
+    const ingredientMap = {};
 
     Object.values(plannerData).flat().forEach(id => {
         const r = recipes.find(rec => rec.id === id);
         if (r && r.ingredients) {
-            r.ingredients.split('\n').forEach(i => {
-                if (i.trim()) {
-                    const item = i.trim().toLowerCase();
-                    ingredientCounts[item] = (ingredientCounts[item] || 0) + 1;
+            r.ingredients.split('\n').filter(i => i.trim()).forEach(i => {
+                const parts = i.trim().split('|').map(p => p.trim());
+                const name = (parts[0] || '').toLowerCase();
+                if (!name) return;
+                const cantidad = parts[1] || '';
+                const unidad = (parts[2] || '').toLowerCase();
+
+                const key = name + '|' + unidad;
+                if (!ingredientMap[name]) {
+                    ingredientMap[name] = { displayName: parts[0], units: {}, recipeCount: 0, recipesSet: new Set() };
+                }
+                ingredientMap[name].recipesSet.add(id);
+                if (!ingredientMap[name].units[unidad]) {
+                    ingredientMap[name].units[unidad] = { total: 0, textParts: [] };
+                }
+
+                // Try to parse number
+                const numMatch = cantidad.match(/^(\d+\.?\d*)\s*(.*)/);
+                if (numMatch) {
+                    ingredientMap[name].units[unidad].total += parseFloat(numMatch[1]);
+                    if (numMatch[2]) {
+                        const suffix = numMatch[2].trim();
+                        if (suffix && !unidad) {
+                            ingredientMap[name].units[unidad].textParts.push(suffix);
+                        }
+                    }
+                } else if (cantidad) {
+                    ingredientMap[name].units[unidad].textParts.push(cantidad);
                 }
             });
         }
     });
 
-    if (Object.keys(ingredientCounts).length === 0) {
+    const entries = Object.values(ingredientMap);
+    if (entries.length === 0) {
         shoppingContent.innerHTML = '<p class="no-recipes">Añade recetas al planificador para ver tu lista de compras.</p>';
         return;
     }
 
-    Object.entries(ingredientCounts).sort().forEach(([item, count]) => {
+    // Header
+    const header = document.createElement('div');
+    header.className = 'shopping-header';
+    header.innerHTML = `<span>Ingrediente</span><span>Cantidad Total</span>`;
+    shoppingContent.appendChild(header);
+
+    entries.sort((a, b) => a.displayName.localeCompare(b.displayName)).forEach(ing => {
+        const displayName = ing.displayName.charAt(0).toUpperCase() + ing.displayName.slice(1);
+        const recipeCount = ing.recipesSet.size;
+        const recipeLabel = recipeCount > 1 ? `<span class="recipe-count-label">de ${recipeCount} recetas</span>` : '';
+        const unitEntries = Object.entries(ing.units);
+        let cantidadHtml = '';
+
+        if (unitEntries.length === 1 && unitEntries[0][0] === '') {
+            // No unit specified
+            const data = unitEntries[0][1];
+            if (data.total > 0) {
+                cantidadHtml = `<span class="shopping-qty">${data.total}</span>`;
+            }
+            const textQty = data.textParts.filter(Boolean).join(', ');
+            if (textQty) {
+                cantidadHtml += cantidadHtml ? `<span class="shopping-detail">${textQty}</span>` : `<span class="shopping-detail">${textQty}</span>`;
+            }
+        } else {
+            cantidadHtml = unitEntries.map(([unidad, data]) => {
+                let part = '';
+                if (data.total > 0) {
+                    part = `${data.total}`;
+                    if (unidad) part += ` ${unidad}`;
+                }
+                const textQty = data.textParts.filter(Boolean).join(', ');
+                if (textQty) {
+                    part = part ? `${part}, ${textQty}` : textQty;
+                }
+                return part;
+            }).filter(Boolean).join(' + ');
+        }
+
         const div = document.createElement('div');
         div.className = 'shopping-item';
-        const displayItem = item.charAt(0).toUpperCase() + item.slice(1);
-        const countLabel = count > 1 ? `<span class="item-count">x${count}</span>` : '';
-        div.innerHTML = `<span>${displayItem}${countLabel}</span><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon>`;
+        div.innerHTML = `<span class="shopping-name">${displayName}${recipeLabel}</span><span class="shopping-qty-cell">${cantidadHtml}</span><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon>`;
         shoppingContent.appendChild(div);
     });
 }
@@ -927,7 +1043,7 @@ function openCookMode(recipe) {
             <div class="cook-ingredients">
                 <h2 class="cook-col-title">INGREDIENTES <span>(Toca para marcar)</span></h2>
                 <ul class="checklist">
-                    ${recipe.ingredients.split('\n').map(i => i.trim() ? `<li onclick="this.classList.toggle('checked')">${i.trim()}</li>` : '').join('')}
+                    ${recipe.ingredients.split('\n').filter(i => i.trim()).map(i => `<li onclick="this.classList.toggle('checked')">${renderIngredientLine(i.trim())}</li>`).join('')}
                 </ul>
             </div>
 
