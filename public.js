@@ -2,6 +2,9 @@ let publicRecipes = [];
 let publicCurrentSearch = '';
 let userRecipeIds = new Set();
 let isUserLoggedIn = false;
+let currentPage = 1;
+const recipesPerPage = 12;
+let totalPages = 1;
 
 // DOM Elements
 const publicGrid = document.getElementById('public-recipe-grid');
@@ -135,18 +138,26 @@ function renderPublicRecipes() {
         return matchesName || matchesIngredients || matchesTags;
     });
 
+    // Calculate pagination
+    totalPages = Math.ceil(filtered.length / recipesPerPage);
+    if (currentPage > totalPages) currentPage = totalPages || 1;
+    const startIndex = (currentPage - 1) * recipesPerPage;
+    const endIndex = startIndex + recipesPerPage;
+    const paginatedRecipes = filtered.slice(startIndex, endIndex);
+
     publicGrid.innerHTML = '';
     if (filtered.length === 0) {
-         publicGrid.innerHTML = `
-             <div class="no-recipes">
-                 <span class="material-icons">sentiment_dissatisfied</span>
-                 <p>No se encontraron recetas</p>
-             </div>
-         `;
+        publicGrid.innerHTML = `
+            <div class="no-recipes">
+                <span class="material-icons">sentiment_dissatisfied</span>
+                <p>No se encontraron recetas</p>
+            </div>
+        `;
+        renderPagination(0, 0);
         return;
     }
 
-    filtered.forEach(recipe => {
+    paginatedRecipes.forEach(recipe => {
         const card = document.createElement('div');
         card.className = 'recipe-card public-card';
         const displayTags = (recipe.tags || []).slice(0, 2).map(t => `<span class="tag">${t}</span>`).join('');
@@ -155,40 +166,89 @@ function renderPublicRecipes() {
         let buttonHtml = '';
         if (isUserLoggedIn) {
             if (alreadyOwned) {
-                 buttonHtml = `<button class="btn-add-recipe owned" disabled>
-                     <span class="material-icons">check_circle</span>
-                     <span>Ya en tu recetario</span>
-                 </button>`;
+                buttonHtml = `<button class="btn-add-recipe owned" disabled>
+                    <span class="material-icons">check_circle</span>
+                    <span>Ya en tu recetario</span>
+                </button>`;
             } else {
-                 buttonHtml = `<button class="btn-add-recipe" onclick="event.stopPropagation(); addToMyRecipes(${recipe.id})">
-                     <span class="material-icons">add_circle_outline</span>
-                     <span>A mi recetario</span>
-                 </button>`;
+                buttonHtml = `<button class="btn-add-recipe" onclick="event.stopPropagation(); addToMyRecipes(${recipe.id})">
+                    <span class="material-icons">add_circle_outline</span>
+                    <span>A mi recetario</span>
+                </button>`;
             }
         }
 
         card.innerHTML = `
             <div class="recipe-card-img-container">
                 <img src="${recipe.image || 'https://images.unsplash.com/photo-1495195129352-aed325a55b65?auto=format&fit=crop&q=80&w=800'}" class="recipe-img" alt="${recipe.name}">
-                 <div class="author-badge">
-                     <span class="material-icons">person_outline</span>
-                     <span>${recipe.authorName || 'Anónimo'}</span>
-                 </div>
-                 ${recipe.video ? '<div class="video-badge"><span class="material-icons">play_arrow</span></div>' : ''}
+                <div class="author-badge">
+                    <span class="material-icons">person_outline</span>
+                    <span>${recipe.authorName || 'Anónimo'}</span>
+                </div>
+                ${recipe.video ? '<div class="video-badge"><span class="material-icons">play_arrow</span></div>' : ''}
             </div>
             <div class="recipe-info">
                 <div class="recipe-tags">${displayTags}</div>
                 <h3>${recipe.name}</h3>
-                 <div class="recipe-meta">
-                     <span><span class="material-icons">schedule</span> ${recipe.time || '--'} min</span>
-                     <span><span class="material-icons">bar_chart</span> ${recipe.difficulty || 'Media'}</span>
-                 </div>
+                <div class="recipe-meta">
+                    <span><span class="material-icons">schedule</span> ${recipe.time || '--'} min</span>
+                    <span><span class="material-icons">bar_chart</span> ${recipe.difficulty || 'Media'}</span>
+                </div>
                 ${buttonHtml}
             </div>
         `;
         card.addEventListener('click', () => viewPublicRecipe(recipe.id));
         publicGrid.appendChild(card);
     });
+
+    // Render pagination
+    renderPagination(filtered.length, paginatedRecipes.length);
+}
+
+function renderPagination(totalRecipes, showingRecipes) {
+    // Remove existing pagination if any
+    const existingPagination = document.querySelector('.pagination-container');
+    if (existingPagination) existingPagination.remove();
+
+    if (totalPages <= 1) return;
+
+    const paginationContainer = document.createElement('div');
+    paginationContainer.className = 'pagination-container';
+    
+    let paginationHtml = '<div class="pagination">';
+    
+    // Previous button
+    paginationHtml += `<button class="pagination-btn ${currentPage === 1 ? 'disabled' : ''}" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+        <span class="material-icons">chevron_left</span>
+    </button>`;
+    
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+            paginationHtml += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+            paginationHtml += '<span class="pagination-ellipsis">...</span>';
+        }
+    }
+    
+    // Next button
+    paginationHtml += `<button class="pagination-btn ${currentPage === totalPages ? 'disabled' : ''}" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+        <span class="material-icons">chevron_right</span>
+    </button>`;
+    
+    paginationHtml += '</div>';
+    paginationHtml += `<div class="pagination-info">Mostrando ${showingRecipes} de ${totalRecipes} recetas</div>`;
+    
+    paginationContainer.innerHTML = paginationHtml;
+    publicGrid.parentNode.appendChild(paginationContainer);
+}
+
+function changePage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderPublicRecipes();
+    // Scroll to top of recipes section
+    document.querySelector('.public-recipes-section').scrollIntoView({ behavior: 'smooth' });
 }
 
 // --- View Public Recipe ---
