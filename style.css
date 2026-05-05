@@ -3310,16 +3310,16 @@ input:checked + .slider {
 
 .m3-app .avatar-dropdown {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 12px);
     right: 0;
-    width: 220px;
+    width: 240px;
     background: var(--m3-surface-container);
     border: 1px solid var(--m3-surface-container-highest);
     border-radius: var(--m3-shape-medium);
-    padding: 0.5rem;
+    padding: 0.75rem;
     display: none;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
     z-index: 1100;
     box-shadow: var(--m3-elevation-3);
 }
@@ -3330,8 +3330,8 @@ input:checked + .slider {
 }
 
 .m3-app .dropdown-header {
-    padding: 0.75rem 1rem 0.5rem;
-    font-size: 0.7rem;
+    padding: 0.875rem 1.25rem 0.75rem;
+    font-size: 0.75rem;
     color: var(--m3-on-surface-variant);
     font-weight: 500;
     text-transform: uppercase;
@@ -3342,14 +3342,14 @@ input:checked + .slider {
     background: transparent;
     border: none;
     color: var(--m3-on-surface);
-    padding: 0.75rem 1rem;
+    padding: 0.875rem 1.25rem;
     text-align: left;
     border-radius: var(--m3-shape-medium);
     width: 100%;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     transition: background var(--m3-duration-short) var(--m3-motion-standard);
     cursor: pointer;
 }
@@ -3366,7 +3366,7 @@ input:checked + .slider {
 .m3-app .dropdown-divider {
     height: 1px;
     background: var(--m3-surface-container-highest);
-    margin: 0.5rem 0.5rem;
+    margin: 0.75rem 0.75rem;
 }
 
 /* --- M3 Custom Dropdown (Tags) --- */
@@ -3473,6 +3473,16 @@ input:checked + .slider {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 768px) {
+    .m3-app .recipe-grid {
+        grid-template-columns: 1fr !important;
+    }
 }
 
 /* --- M3 Recipe Card --- */
@@ -3602,8 +3612,15 @@ input:checked + .slider {
     letter-spacing: 0.5px;
 }
 
-.m3-app .recipe-card h3 {
-    font-size: 1.25rem;
+.m3-app .recipe-info .recipe-meta {
+    display: flex;
+    gap: 1rem;
+    color: var(--m3-on-surface-variant);
+    font-size: 1rem;
+}
+
+.m3-app .recipe-info h3 {
+    font-size: 1.4rem;
     font-weight: 500;
     color: var(--m3-on-surface);
     margin-bottom: 0.5rem;
@@ -4096,7 +4113,7 @@ input:checked + .slider {
 }
 
 .m3-app .detail-ingredients {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: var(--m3-on-surface);
     line-height: 1.8;
 }
@@ -4116,7 +4133,7 @@ input:checked + .slider {
 }
 
 .m3-app .detail-steps {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: var(--m3-on-surface);
     line-height: 1.8;
     white-space: pre-wrap;
@@ -4728,6 +4745,8 @@ input:checked + .slider {
     align-items: center;
     padding: 0 0.5rem;
     box-shadow: var(--m3-elevation-3);
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .m3-app .mobile-bottom-nav .nav-item {
@@ -4796,6 +4815,8 @@ input:checked + .slider {
     z-index: 1000;
     gap: 0.75rem;
     align-items: center;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .m3-app .mobile-logo-link {
@@ -4856,49 +4877,294 @@ input:checked + .slider {
         padding: 1rem 1.5rem 2rem;
     }
 
-    .m3-app .detail-header-info h1 {
-        font-size: 2rem;
+/* Fix #app container and children to prevent overflow */
+.m3-app #app {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.m3-app #app * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Mobile Top Bar - MD3 */
+.m3-app .mobile-top-bar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 16px;
+    background: var(--m3-surface-container);
+    border-bottom: 1px solid var(--m3-surface-container-highest);
+    z-index: 1000;
+    gap: 12px;
+    align-items: center;
+    box-shadow: var(--m3-elevation-1);
+    box-sizing: border-box;
+}
+
+.m3-app .mobile-top-bar .mobile-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--m3-on-surface);
+    text-decoration: none;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.m3-app .mobile-top-bar .mobile-logo-link .material-icons {
+    font-size: 1.5rem;
+    color: var(--m3-primary);
+}
+
+.m3-app .mobile-top-bar .search-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--m3-surface-container-highest);
+    border-radius: var(--m3-shape-full);
+    padding: 8px 16px;
+    max-width: 100%;
+}
+
+.m3-app .mobile-top-bar .search-container .material-icons {
+    color: var(--m3-on-surface-variant);
+    font-size: 1.25rem;
+}
+
+.m3-app .mobile-top-bar .search-container input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--m3-on-surface);
+    font-size: 0.875rem;
+    outline: none;
+    font-family: var(--m3-font-family);
+}
+
+.m3-app .mobile-top-bar .search-container input::placeholder {
+    color: var(--m3-on-surface-variant);
+}
+
+.m3-app .mobile-top-bar .custom-dropdown {
+    position: relative;
+}
+
+.m3-app .mobile-top-bar .dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    background: var(--m3-surface-container-highest);
+    border-radius: var(--m3-shape-full);
+    cursor: pointer;
+    color: var(--m3-on-surface-variant);
+}
+
+.m3-app .mobile-top-bar .dropdown-trigger .material-icons {
+    font-size: 1.25rem;
+}
+
+.m3-app .mobile-top-bar .dropdown-options {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: var(--m3-surface-container);
+    border: 1px solid var(--m3-surface-container-highest);
+    border-radius: var(--m3-shape-medium);
+    box-shadow: var(--m3-elevation-2);
+    min-width: 160px;
+    list-style: none;
+    padding: 8px 0;
+    z-index: 1001;
+}
+
+.m3-app .mobile-top-bar .dropdown-options li {
+    padding: 12px 16px;
+    cursor: pointer;
+    color: var(--m3-on-surface);
+    font-size: 0.875rem;
+}
+
+.m3-app .mobile-top-bar .dropdown-options li:hover {
+    background: var(--m3-surface-container-highest);
+}
+
+.m3-app .mobile-top-bar .user-profile .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--m3-shape-full);
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.m3-app .mobile-top-bar .avatar-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: var(--m3-surface-container);
+    border: 1px solid var(--m3-surface-container-highest);
+    border-radius: var(--m3-shape-medium);
+    box-shadow: var(--m3-elevation-2);
+    min-width: 200px;
+    padding: 8px 0;
+    z-index: 1001;
+}
+
+.m3-app .mobile-top-bar .avatar-dropdown .dropdown-header {
+    padding: 12px 16px;
+    color: var(--m3-on-surface-variant);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.m3-app .mobile-top-bar .avatar-dropdown button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    color: var(--m3-on-surface);
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-align: left;
+    font-family: var(--m3-font-family);
+}
+
+.m3-app .mobile-top-bar .avatar-dropdown button:hover {
+    background: var(--m3-surface-container-highest);
+}
+
+.m3-app .mobile-top-bar .avatar-dropdown button .material-icons {
+    font-size: 1.25rem;
+    color: var(--m3-on-surface-variant);
+}
+
+.m3-app .mobile-top-bar .avatar-dropdown .dropdown-divider {
+    height: 1px;
+    background: var(--m3-surface-container-highest);
+    margin: 8px 0;
+}
+
+/* Mobile Bottom Nav - MD3 */
+.m3-app .mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: var(--m3-surface-container);
+    border-top: 1px solid var(--m3-surface-container-highest);
+    z-index: 1000;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 8px;
+    box-shadow: var(--m3-elevation-3);
+    box-sizing: border-box;
+}
+
+.m3-app .mobile-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: var(--m3-on-surface-variant);
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: var(--m3-shape-small);
+    transition: all 0.2s;
+}
+
+.m3-app .mobile-bottom-nav .nav-item .material-icons {
+    font-size: 1.5rem;
+}
+
+.m3-app .mobile-bottom-nav .nav-item.active {
+    color: var(--m3-primary);
+}
+
+.m3-app .mobile-bottom-nav .nav-item:hover {
+    background: var(--m3-surface-container-highest);
+}
+
+.m3-app .mobile-bottom-nav .floating-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--m3-shape-large);
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+    box-shadow: var(--m3-elevation-3);
+    cursor: pointer;
+    margin-top: -20px;
+    transition: box-shadow 0.2s;
+}
+
+.m3-app .mobile-bottom-nav .floating-add-btn:hover {
+    box-shadow: var(--m3-elevation-4);
+}
+
+.m3-app .mobile-bottom-nav .floating-add-btn .material-icons {
+    font-size: 1.5rem;
+}
+
+    .m3-app .mobile-top-bar {
+        display: flex !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        box-sizing: border-box;
     }
 
-    .m3-app .modal-content {
-        margin: 0;
+    .m3-app .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        box-sizing: border-box;
+    }
+
+    .m3-app .content {
+        padding: 5rem 1rem 5rem;
         width: 100%;
         max-width: 100%;
-        border-radius: 0;
-        max-height: 100vh;
+        overflow-x: hidden;
+        box-sizing: border-box;
     }
 
-    .m3-app .detail-footer {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .m3-app .detail-footer button,
-    .m3-app .detail-footer a {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .m3-app .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .m3-app .mobile-bottom-nav .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        color: var(--m3-on-surface-variant);
-        font-size: 0.75rem;
-        width: 20%;
-    }
-
-    .m3-app .mobile-bottom-nav .nav-item.active {
-        color: var(--m3-primary);
-    }
-
-    .m3-app .mobile-bottom-nav .nav-item .material-icons {
-        font-size: 1.6rem;
+    .m3-app .mobile-top-bar *,
+    .m3-app .mobile-bottom-nav * {
+        max-width: 100%;
+        box-sizing: border-box;
     }
 }
 
@@ -4906,23 +5172,46 @@ input:checked + .slider {
     .m3-app .main-header {
         display: none !important;
     }
-
+    
     .m3-app .mobile-top-bar {
         display: flex !important;
     }
-
+    
     .m3-app .mobile-bottom-nav {
         display: flex !important;
     }
-
+    
+    .m3-app .content {
+        padding: calc(65px + 1rem) 1rem calc(65px + 2rem);
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+    
+    .m3-app .recipe-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    .m3-app .recipe-grid-container {
+        margin-bottom: 2rem;
+    }
+    
+    .m3-app .recipe-card {
+        width: 100%;
+        max-width: 100%;
+    }
+    
     .m3-app .floating-add-btn {
         display: flex !important;
     }
-
+    
     .m3-app .random-card {
         height: 260px;
     }
-
+    
     .m3-app .random-card-info h3 {
         font-size: 1.5rem;
     }
@@ -4932,11 +5221,11 @@ input:checked + .slider {
     .m3-app .header-info h1 {
         font-size: 1.75rem;
     }
-
+    
     .m3-app .recipe-grid {
         grid-template-columns: 1fr;
     }
-
+    
     .m3-app .detail-hero {
         height: 250px;
         border-radius: 0;
@@ -5081,4 +5370,72 @@ input:checked + .slider {
 
 .m3-app .surface-container-highest {
     background: var(--m3-surface-container-highest);
+}
+
+ /* --- Hide Import/Export JSON functionality (CSS only, keep JS working) --- */
+.m3-app .import-json-btn-menu,
+.m3-app .export-json-btn-menu {
+    display: none !important;
+}
+
+/* --- Pagination Styles --- */
+.pagination-container {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem 1rem;
+    width:100%;
+    box-sizing: border-box;
+}
+
+.pagination {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.5rem;
+    border: 1px solid var(--m3-surface-container-highest);
+    background: var(--m3-surface-container);
+    color: var(--m3-on-surface);
+    border-radius: var(--m3-shape-medium);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    font-family: var(--m3-font-family);
+}
+
+.pagination-btn:hover:not(.disabled):not(.active) {
+    background: var(--m3-surface-container-high);
+    border-color: var(--m3-primary);
+}
+
+.pagination-btn.active {
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+    border-color: var(--m3-primary);
+}
+
+.pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-ellipsis {
+    color: var(--m3-on-surface-variant);
+    padding: 0 0.25rem;
+}
+
+.pagination-info {
+    color: var(--m3-on-surface-variant);
+    font-size: 0.875rem;
 }
