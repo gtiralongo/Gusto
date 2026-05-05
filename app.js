@@ -282,7 +282,7 @@ function renderRecipes() {
     if (filtered.length === 0) {
         recipeGrid.innerHTML = `
             <div class="no-recipes">
-                <ion-icon name="sad-outline"></ion-icon>
+                <span class="material-icons">sentiment_dissatisfied</span>
                 <p>No se encontraron recetas</p>
             </div>
         `;
@@ -292,22 +292,22 @@ function renderRecipes() {
         const card = document.createElement('div');
         card.className = 'recipe-card';
         const displayTags = (recipe.tags || []).slice(0, 2).map(t => `<span class="tag">${t}</span>`).join('');
-        const publicBadge = recipe.isPublic ? '<div class="public-badge"><ion-icon name="earth-outline"></ion-icon></div>' : '';
+        const publicBadge = recipe.isPublic ? '<div class="public-badge"><span class="material-icons">public</span></div>' : '';
         card.innerHTML = `
             <div class="recipe-card-img-container">
                 <img src="${recipe.image || 'https://images.unsplash.com/photo-1495195129352-aed325a55b65?auto=format&fit=crop&q=80&w=800'}" class="recipe-img" alt="${recipe.name}">
                 <button class="favorite-btn ${recipe.isFavorite ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(${recipe.id})">
-                    <ion-icon name="${recipe.isFavorite ? 'star' : 'star-outline'}"></ion-icon>
+                    <span class="material-icons">${recipe.isFavorite ? 'star' : 'star_outline'}</span>
                 </button>
                 ${publicBadge}
-                ${recipe.video ? '<div class="video-badge"><ion-icon name="play"></ion-icon></div>' : ''}
+                 ${recipe.video ? '<div class="video-badge"><span class="material-icons">play_arrow</span></div>' : ''}
             </div>
             <div class="recipe-info">
                 <div class="recipe-tags">${displayTags}</div>
                 <h3>${recipe.name}</h3>
                 <div class="recipe-meta">
-                    <span><ion-icon name="time-outline"></ion-icon> ${recipe.time || '--'} min</span>
-                    <span><ion-icon name="bar-chart-outline"></ion-icon> ${recipe.difficulty || 'Media'}</span>
+                     <span><span class="material-icons">schedule</span> ${recipe.time || '--'} min</span>
+                     <span><span class="material-icons">bar_chart</span> ${recipe.difficulty || 'Media'}</span>
                 </div>
             </div>
         `;
@@ -687,8 +687,8 @@ function viewRecipe(id) {
                     <div class="recipe-tags" style="margin-bottom: 1rem;">${tagsHtml}</div>
                     <h1>${recipe.name}</h1>
                     <div class="detail-meta-row">
-                        <span><ion-icon name="time-outline"></ion-icon> ${recipe.time || '--'} min</span>
-                        <span><ion-icon name="bar-chart-outline"></ion-icon> ${recipe.difficulty || 'Media'}</span>
+                     <span><span class="material-icons">schedule</span> ${recipe.time || '--'} min</span>
+                     <span><span class="material-icons">bar_chart</span> ${recipe.difficulty || 'Media'}</span>
                     </div>
                 </div>
 
@@ -713,10 +713,10 @@ function viewRecipe(id) {
 
                 <div class="detail-footer">
                     <button class="btn-danger-outline" id="delete-recipe-permanent">
-                        <ion-icon name="trash-outline"></ion-icon> 
-                        Eliminar Receta
-                    </button>
-                    ${recipe.video ? `<a href="${recipe.video}" target="_blank" class="cook-video-link"><ion-icon name="logo-youtube"></ion-icon> Ver en YouTube</a>` : ''}
+                         <span class="material-icons">delete</span> 
+                         Eliminar Receta
+                     </button>
+                     ${recipe.video ? `<a href="${recipe.video}" target="_blank" class="cook-video-link"><span class="material-icons">smart_display</span> Ver en YouTube</a>` : ''}
                 </div>
             </div>
         </div>
@@ -732,13 +732,13 @@ function viewRecipe(id) {
         }
     };
 
-    const favIcon = favoriteCurrentBtn.querySelector('ion-icon');
+    const favIcon = favoriteCurrentBtn.querySelector('.material-icons');
     if (recipe.isFavorite) {
         favoriteCurrentBtn.classList.add('active');
-        favIcon.setAttribute('name', 'star');
+        favIcon.textContent = 'star';
     } else {
         favoriteCurrentBtn.classList.remove('active');
-        favIcon.setAttribute('name', 'star-outline');
+        favIcon.textContent = 'star_outline';
     }
 
     favoriteCurrentBtn.onclick = () => {
@@ -801,8 +801,8 @@ function renderTagsManager() {
         <div class="tag-manager-item">
             <span class="tag-manager-item-name">${tag}</span>
             <div class="tag-manager-actions">
-                <button class="btn-icon" onclick="editTag(${i})"><ion-icon name="create-outline"></ion-icon></button>
-                <button class="btn-icon" style="color: #ef4444;" onclick="deleteTag(${i})"><ion-icon name="trash-outline"></ion-icon></button>
+                <button class="btn-icon" onclick="editTag(${i})"><span class="material-icons">edit</span></button>
+                 <button class="btn-icon" style="color: #ef4444;" onclick="deleteTag(${i})"><span class="material-icons">delete</span></button>
             </div>
         </div>
     `).join('');
@@ -870,7 +870,7 @@ function renderWeeklyPlanner() {
             const r = recipes.find(rec => rec.id === id);
             return r ? `<div class="planner-recipe">
                 <span>${r.name}</span>
-                <button class="btn-icon circle-sm danger" onclick="removeFromPlanner('${day}', ${id})"><ion-icon name="close-outline"></ion-icon></button>
+                 <button class="btn-icon circle-sm danger" onclick="removeFromPlanner('${day}', ${id})"><span class="material-icons">close</span></button>
             </div>` : '';
         }).join('');
 
@@ -878,9 +878,9 @@ function renderWeeklyPlanner() {
             <h3>${day}</h3>
             ${plannedRecipes}
             <div class="planner-slot" onclick="openPlannerSelector('${day}')">
-                <ion-icon name="add-outline"></ion-icon>
-                <span>Añadir receta</span>
-            </div>
+                 <span class="material-icons">add</span>
+                 <span>Añadir receta</span>
+             </div>
         `;
         plannerGrid.appendChild(dayDiv);
     });
@@ -912,8 +912,8 @@ function renderPlannerSelectorList(filter = '') {
         item.className = 'planner-list-item';
         item.innerHTML = `
             <img src="${r.image || 'https://images.unsplash.com/photo-1495195129352-aed325a55b65?auto=format&fit=crop&q=80&w=200'}" class="planner-list-thumbnail">
-            <span class="planner-list-name">${r.name}</span>
-            <ion-icon name="add-circle-outline" style="font-size: 1.5rem;"></ion-icon>
+             <span class="planner-list-name">${r.name}</span>
+             <span class="material-icons" style="font-size: 1.5rem;">add_circle_outline</span>
         `;
         item.onclick = () => {
             if (!plannerData[activePlannerDay]) plannerData[activePlannerDay] = [];
@@ -1022,7 +1022,7 @@ function renderShoppingList() {
 
         const div = document.createElement('div');
         div.className = 'shopping-item';
-        div.innerHTML = `<span class="shopping-name">${displayName}${recipeLabel}</span><span class="shopping-qty-cell">${cantidadHtml}</span><ion-icon name="checkmark-circle-outline" color="primary"></ion-icon>`;
+         div.innerHTML = `<span class="shopping-name">${displayName}${recipeLabel}</span><span class="shopping-qty-cell">${cantidadHtml}</span><span class="material-icons" style="color: var(--primary);">check_circle_outline</span>`;
         shoppingContent.appendChild(div);
     });
 }
@@ -1034,10 +1034,10 @@ function openCookMode(recipe) {
                 <div class="cook-title-area">
                     <h1>${recipe.name}</h1>
                     <div id="cook-video-link-container">
-                        ${recipe.video ? `<a href="${recipe.video}" target="_blank" class="cook-video-link"><ion-icon name="logo-youtube"></ion-icon> Ver Video Tutorial</a>` : ''}
+                        ${recipe.video ? `<a href="${recipe.video}" target="_blank" class="cook-video-link"><span class="material-icons">smart_display</span> Ver Video Tutorial</a>` : ''}
                     </div>
                 </div>
-                <button class="btn-close-circle" onclick="document.getElementById('cook-overlay').style.display='none'"><ion-icon name="close-outline"></ion-icon></button>
+                <button class="btn-close-circle" onclick="document.getElementById('cook-overlay').style.display='none'"><span class="material-icons">close</span></button>
             </header>
 
             <div class="cook-ingredients">

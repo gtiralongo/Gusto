@@ -45,7 +45,7 @@ function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.innerHTML = `
-        <ion-icon name="${type === 'success' ? 'checkmark-circle' : 'alert-circle'}"></ion-icon>
+        <span class="material-icons">${type === 'success' ? 'check_circle' : 'error'}</span>
         <span>${message}</span>
     `;
     document.body.appendChild(toast);

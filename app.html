@@ -9,10 +9,8 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <!-- Ionicons for Icons -->
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Favicon -->
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3565/3565418.png" type="image/x-icon">
     <link rel="manifest" href="manifest.json">
@@ -23,20 +21,20 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 </head>
 
-<body class="dark-theme">
+<body class="dark-theme m3-app">
     <!-- Login Screen Overlay -->
     <div id="login-screen" class="auth-overlay">
         <div class="auth-card glass">
             <div class="auth-logo">
-                <ion-icon name="restaurant"></ion-icon>
-                <span>Gusto</span>
+                <span class="material-icons">restaurant</span>
+                 <span>Gusto</span>
             </div>
             <h1>Bienvenido a tu Recetario</h1>
             <p>Guarda y organiza tus platos favoritos de forma privada y segura en la nube.</p>
-            <button id="main-login-btn" class="btn-primary">
-                <ion-icon name="logo-google"></ion-icon>
-                <span>Entrar con Google</span>
-            </button>
+                <button id="main-login-btn" class="btn-primary">
+                 <span class="material-icons">login</span>
+                 <span>Entrar con Google</span>
+             </button>
             <div class="auth-footer">
                 Tus recetas se sincronizan automáticamente en todos tus dispositivos.
             </div>
@@ -47,8 +45,8 @@
         <header class="main-header glass">
             <div class="header-content">
                 <a href="index.html" class="logo" style="cursor: pointer; text-decoration: none;">
-                    <ion-icon name="restaurant"></ion-icon>
-                    <span>Gusto</span>
+                <span class="material-icons">restaurant</span>
+                     <span>Gusto</span>
                 </a>
 
                 <nav class="top-nav">
@@ -60,7 +58,7 @@
                     <div class="custom-dropdown" id="tag-dropdown-desktop">
                         <div class="dropdown-trigger">
                             <span id="current-tag-label-desktop">Todas las Tags</span>
-                            <ion-icon name="chevron-down-outline"></ion-icon>
+                            <span class="material-icons">expand_more</span>
                         </div>
                         <ul class="dropdown-options" id="tag-options-desktop">
                             <li data-tag="all">Todas las Tags</li>
@@ -70,14 +68,14 @@
                 </nav>
 
                 <div class="header-actions">
-                    <div class="search-container">
-                        <ion-icon name="search-outline"></ion-icon>
-                        <input type="text" id="recipe-search" placeholder="Buscar receta...">
-                    </div>
+                <div class="search-container">
+                         <span class="material-icons">search</span>
+                         <input type="text" id="recipe-search" placeholder="Buscar receta...">
+                     </div>
 
                     <div class="header-btn-group">
                         <button id="add-recipe-btn-desktop" class="btn-primary-sm">
-                            <ion-icon name="add"></ion-icon>
+                            <span class="material-icons">add</span>
                             <span>Nueva</span>
                         </button>
 
@@ -86,15 +84,14 @@
                                 <div class="avatar" id="user-avatar">U</div>
                                 <div class="avatar-dropdown glass">
                                     <div class="dropdown-header">Mi Cuenta</div>
-                                    <button class="manage-tags-btn"><ion-icon name="pricetags-outline"></ion-icon>
-                                        Gestionar Tags</button>
-                                    <button class="import-json-btn-menu"><ion-icon
-                                            name="code-working-outline"></ion-icon> Importar JSON</button>
-                                    <button class="export-json-btn-menu"><ion-icon name="download-outline"></ion-icon>
-                                        Exportar JSON</button>
+                                    <button class="manage-tags-btn"><span class="material-icons">sell</span>
+                                         Gestionar Tags</button>
+                                    <button class="import-json-btn-menu"><span class="material-icons">code</span> Importar JSON</button>
+                                    <button class="export-json-btn-menu"><span class="material-icons">download</span>
+                                         Exportar JSON</button>
                                     <div class="dropdown-divider"></div>
-                                    <button class="logout-btn"><ion-icon name="log-out-outline"></ion-icon> Cerrar
-                                        Sesión</button>
+                                    <button class="logout-btn"><span class="material-icons">logout</span> Cerrar
+                                         Sesión</button>
                                 </div>
                             </div>
                         </div>
@@ -105,40 +102,40 @@
 
         <!-- Mobile Bottom Navigation -->
         <nav class="mobile-bottom-nav glass">
-            <div class="nav-item active" data-view="home">
-                <ion-icon name="restaurant-outline"></ion-icon>
-                <span>Recetas</span>
-            </div>
-            <div class="nav-item" data-view="favorites">
-                <ion-icon name="star-outline"></ion-icon>
-                <span>Favoritos</span>
-            </div>
-            <div class="floating-add-btn" id="add-recipe-btn-mobile">
-                <ion-icon name="add"></ion-icon>
-            </div>
-            <div class="nav-item" data-view="planner">
-                <ion-icon name="calendar-outline"></ion-icon>
-                <span>Planer</span>
-            </div>
-            <div class="nav-item" data-view="shopping">
-                <ion-icon name="cart-outline"></ion-icon>
-                <span>Compras</span>
-            </div>
+                <div class="nav-item active" data-view="home">
+                 <span class="material-icons">restaurant</span>
+                 <span>Recetas</span>
+             </div>
+             <div class="nav-item" data-view="favorites">
+                 <span class="material-icons">star_outline</span>
+                 <span>Favoritos</span>
+             </div>
+             <div class="floating-add-btn" id="add-recipe-btn-mobile">
+                 <span class="material-icons">add</span>
+             </div>
+             <div class="nav-item" data-view="planner">
+                 <span class="material-icons">calendar_today</span>
+                 <span>Planer</span>
+             </div>
+             <div class="nav-item" data-view="shopping">
+                 <span class="material-icons">shopping_cart</span>
+                 <span>Compras</span>
+             </div>
         </nav>
 
         <!-- Mobile Top Bar (Search + Tags) -->
         <div class="mobile-top-bar glass">
             <a href="index.html" class="mobile-logo-link">
-                <ion-icon name="restaurant-outline"></ion-icon>
-            </a>
+                 <span class="material-icons">restaurant</span>
+             </a>
             <div class="search-container">
-                <ion-icon name="search-outline"></ion-icon>
-                <input type="text" id="recipe-search-mobile" placeholder="Buscar...">
-            </div>
+                 <span class="material-icons">search</span>
+                 <input type="text" id="recipe-search-mobile" placeholder="Buscar...">
+             </div>
             <div class="custom-dropdown" id="tag-dropdown-mobile">
                 <div class="dropdown-trigger">
-                    <ion-icon name="pricetag-outline"></ion-icon>
-                </div>
+                     <span class="material-icons">label</span>
+                 </div>
                 <ul class="dropdown-options" id="tag-options-mobile">
                     <li data-tag="all">Todas</li>
                     <!-- Tags will be injected here -->
@@ -149,14 +146,14 @@
                     <div class="avatar" id="user-avatar-mobile">U</div>
                     <div class="avatar-dropdown glass">
                         <div class="dropdown-header">Mi Cuenta</div>
-                        <button class="manage-tags-btn"><ion-icon name="pricetags-outline"></ion-icon> Gestionar
-                            Tags</button>
-                        <button class="import-json-btn-menu"><ion-icon name="code-working-outline"></ion-icon> Importar
-                            JSON</button>
-                        <button class="export-json-btn-menu"><ion-icon name="download-outline"></ion-icon> Exportar
-                            JSON</button>
+                        <button class="manage-tags-btn"><span class="material-icons">sell</span> Gestionar
+                             Tags</button>
+                        <button class="import-json-btn-menu"><span class="material-icons">code</span> Importar
+                             JSON</button>
+                        <button class="export-json-btn-menu"><span class="material-icons">download</span> Exportar
+                             JSON</button>
                         <div class="dropdown-divider"></div>
-                        <button class="logout-btn"><ion-icon name="log-out-outline"></ion-icon> Cerrar Sesión</button>
+                        <button class="logout-btn"><span class="material-icons">logout</span> Cerrar Sesión</button>
                     </div>
                 </div>
             </div>
@@ -212,10 +209,9 @@
     <div id="recipe-modal" class="modal">
         <div class="modal-content glass">
             <div class="modal-header">
-                <h2 id="modal-title">Nueva Receta</h2>
-                <button type="button" class="close-modal btn-close-circle"><ion-icon
-                        name="close-outline"></ion-icon></button>
-            </div>
+                 <h2 id="modal-title">Nueva Receta</h2>
+                 <button type="button" class="close-modal btn-close-circle"><span class="material-icons">close</span></button>
+             </div>
             <form id="recipe-form">
                 <div class="form-grid">
                     <div class="input-group">
@@ -243,7 +239,7 @@
                     <div class="input-group full-width">
                         <div class="public-toggle">
                             <label for="recipe-public-toggle" class="toggle-label">
-                                <span class="toggle-icon"><ion-icon name="earth-outline"></ion-icon></span>
+                                <span class="toggle-icon"><span class="material-icons">public</span></span>
                                 <span>Hacer receta pública (visible para todos)</span>
                             </label>
                             <label class="switch">
@@ -261,14 +257,14 @@
                         <div class="input-with-button">
                             <input type="url" id="recipe-image" placeholder="https://images.unsplash.com/...">
                             <button type="button" id="search-google-btn" class="btn-secondary-sm">
-                                <ion-icon name="logo-google"></ion-icon>
-                                Buscar
+                                <span class="material-icons">search</span>
+                                 Buscar
                             </button>
                         </div>
                         <div id="image-preview-container" class="image-preview-container">
                             <img id="image-preview" src="" alt="Preview" style="display: none;">
                             <div id="image-placeholder" class="image-placeholder">
-                                <ion-icon name="image-outline"></ion-icon>
+                                <span class="material-icons">image</span>
                                 <span>Vista previa de la imagen</span>
                             </div>
                         </div>
@@ -297,28 +293,28 @@
         <div class="modal-content glass detail-view">
             <div class="modal-header">
                 <div class="header-actions-row">
-                    <button type="button" class="close-modal btn-close-circle">
-                        <ion-icon name="arrow-back-outline"></ion-icon>
-                    </button>
-                    <button id="favorite-current-btn" class="favorite-btn-static circle">
-                        <ion-icon name="star-outline"></ion-icon>
-                    </button>
-                    <div class="header-main-actions">
-                        <button id="cook-mode-btn" class="btn-cook-pill">
-                            <ion-icon name="flame"></ion-icon>
-                            <span class="hide-mobile">Cocinando</span>
-                        </button>
-                        <button id="share-recipe-btn" class="btn-icon circle">
-                            <ion-icon name="share-social-outline"></ion-icon>
-                        </button>
-                        <button id="edit-current-btn" class="btn-icon circle">
-                            <ion-icon name="create-outline"></ion-icon>
-                        </button>
-                    </div>
-                    <button type="button" class="close-modal btn-close-circle">
-                        <ion-icon name="close-outline"></ion-icon>
-                    </button>
-                </div>
+                     <button type="button" class="close-modal btn-close-circle">
+                         <span class="material-icons">arrow_back</span>
+                     </button>
+                         <button id="favorite-current-btn" class="favorite-btn-static circle">
+                              <span class="material-icons">star_outline</span>
+                          </button>
+                     <div class="header-main-actions">
+                         <button id="cook-mode-btn" class="btn-cook-pill">
+                              <span class="material-icons">local_fire_department</span>
+                              <span class="hide-mobile">Cocinando</span>
+                         </button>
+                         <button id="share-recipe-btn" class="btn-icon circle">
+                              <span class="material-icons">share</span>
+                          </button>
+                         <button id="edit-current-btn" class="btn-icon circle">
+                              <span class="material-icons">edit</span>
+                          </button>
+                     </div>
+                     <button type="button" class="close-modal btn-close-circle">
+                          <span class="material-icons">close</span>
+                      </button>
+                 </div>
             </div>
             <div id="recipe-details" class="details-body">
                 <!-- Details will be injected here -->
@@ -329,11 +325,10 @@
     <!-- Modal for Importing JSON -->
     <div id="import-modal" class="modal">
         <div class="modal-content glass">
-            <div class="modal-header">
-                <h2>Importar desde JSON</h2>
-                <button type="button" class="close-modal btn-close-circle"><ion-icon
-                        name="close-outline"></ion-icon></button>
-            </div>
+        <div class="modal-header">
+             <h2>Importar desde JSON</h2>
+             <button type="button" class="close-modal btn-close-circle"><span class="material-icons">close</span></button>
+         </div>
             <div class="modal-body" style="padding: 2rem;">
                 <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">Pega aquí el código JSON de
                     tu receta para cargarla automáticamente.</p>
@@ -358,7 +353,7 @@
                     <h1 id="cook-title">Título de la Receta</h1>
                     <div id="cook-video-link-container"></div>
                 </div>
-                <button id="exit-cook-btn" class="btn-icon"><ion-icon name="close-outline"></ion-icon></button>
+                <button id="exit-cook-btn" class="btn-icon"><span class="material-icons">close</span></button>
             </header>
             <div class="cook-body">
                 <div class="cook-section">
@@ -376,11 +371,10 @@
     <!-- Modal for Tag Management -->
     <div id="tags-modal" class="modal">
         <div class="modal-content glass">
-            <div class="modal-header">
-                <h2>Gestionar Tags</h2>
-                <button type="button" class="close-modal btn-close-circle"><ion-icon
-                        name="close-outline"></ion-icon></button>
-            </div>
+        <div class="modal-header">
+             <h2>Gestionar Tags</h2>
+             <button type="button" class="close-modal btn-close-circle"><span class="material-icons">close</span></button>
+         </div>
             <div class="modal-body" style="padding: 2rem;">
                 <div class="add-tag-form" style="display: flex; gap: 1rem; margin-bottom: 2rem;">
                     <input type="text" id="new-tag-name" placeholder="Nueva tag..."
@@ -398,14 +392,14 @@
     <div id="planner-modal" class="modal">
         <div class="modal-content glass">
             <div class="modal-header">
-                <h2>Añadir al Plan: <span id="planner-day-name">Día</span></h2>
-                <button type="button" class="close-modal"><ion-icon name="close-outline"></ion-icon></button>
-            </div>
+                 <h2>Añadir al Plan: <span id="planner-day-name">Día</span></h2>
+                 <button type="button" class="close-modal"><span class="material-icons">close</span></button>
+             </div>
             <div class="modal-body">
                 <div class="planner-options-header">
                     <div class="search-container planner-search">
-                        <ion-icon name="search-outline"></ion-icon>
-                        <input type="text" id="planner-search-input" placeholder="Buscar receta para añadir...">
+                         <span class="material-icons">search</span>
+                         <input type="text" id="planner-search-input" placeholder="Buscar receta para añadir...">
                     </div>
                 </div>
                 <div id="planner-options" class="planner-list">
