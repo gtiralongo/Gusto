@@ -1084,6 +1084,58 @@ button {
     background: var(--primary-light);
 }
 
+.planner-view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+}
+
+.planner-toggle-btn {
+    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.planner-toggle-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.planner-toggle-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.planner-meal-section {
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+    border-left: 3px solid var(--border-color);
+}
+
+.planner-meal-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.planner-empty-meal {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin: 0.3rem 0;
+}
+
 .planner-list {
     display: flex;
     flex-direction: column;
@@ -4560,6 +4612,60 @@ input:checked + .slider {
 
 .m3-app .planner-slot .material-icons {
     font-size: 1.25rem;
+}
+
+.m3-app .planner-view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+}
+
+.m3-app .planner-toggle-btn {
+    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--m3-outline-variant);
+    background: transparent;
+    color: var(--m3-on-surface-variant);
+    border-radius: var(--m3-shape-full);
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: all var(--m3-duration-short) var(--m3-motion-standard);
+}
+
+.m3-app .planner-toggle-btn:hover {
+    border-color: var(--m3-primary);
+    color: var(--m3-primary);
+    background: rgba(var(--m3-primary-rgb), 0.08);
+}
+
+.m3-app .planner-toggle-btn.active {
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+    border-color: var(--m3-primary);
+}
+
+.m3-app .planner-meal-section {
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+    border-left: 3px solid var(--m3-outline-variant);
+}
+
+.m3-app .planner-meal-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--m3-on-surface-variant);
+    margin-bottom: 0.5rem;
+}
+
+.m3-app .planner-empty-meal {
+    font-size: 0.8rem;
+    color: var(--m3-on-surface-variant);
+    font-style: italic;
+    margin: 0.3rem 0;
+    padding: 0.25rem 0;
 }
 
 /* --- M3 Planner Modal --- */

@@ -33,6 +33,7 @@ const plannerModal = document.getElementById('planner-modal');
 const plannerDayName = document.getElementById('planner-day-name');
 const plannerOptions = document.getElementById('planner-options');
 let activePlannerDay = '';
+let activePlannerMeal = '';
 
 // Cooking Mode
 const cookOverlay = document.getElementById('cook-overlay');
@@ -97,17 +98,45 @@ function filterByTag(tag) {
     renderRecipes();
 }
 
-let plannerData = JSON.parse(localStorage.getItem('gusto_planner')) || {};
+const MEALS = ['Desayuno', 'Almuerzo', 'Merienda', 'Cena'];
+
+function migratePlannerData(data) {
+    const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const migrated = {};
+    days.forEach(day => {
+        const val = data[day];
+        if (Array.isArray(val)) {
+            const meals = {};
+            MEALS.forEach(m => { meals[m] = []; });
+            val.forEach(id => { meals['Almuerzo'].push(id); });
+            migrated[day] = meals;
+        } else if (val && typeof val === 'object' && !Array.isArray(val)) {
+            const meals = {};
+            MEALS.forEach(m => { meals[m] = val[m] || []; });
+            migrated[day] = meals;
+        } else {
+            const meals = {};
+            MEALS.forEach(m => { meals[m] = []; });
+            migrated[day] = meals;
+        }
+    });
+    return migrated;
+}
+
+let plannerData = migratePlannerData(JSON.parse(localStorage.getItem('gusto_planner')) || {});
 
 // --- Initialization ---
 
 async function init() {
     try {
         if (auth) {
-            await loadData();
             setupEventListeners();
             switchView('home');
             renderRandomRecipes();
+            // Try initial load if auth is already restored
+            if (auth.currentUser) {
+                await loadData();
+            }
         } else {
             console.warn('Firebase Auth no disponible');
         }
@@ -131,6 +160,25 @@ async function loadData() {
         renderTagDropdowns();
     } catch (error) {
         console.error('Error cargando tags:', error);
+    }
+
+    // Load planner from Firebase
+    try {
+        const plannerSnapshot = await db.ref(`users/${userId}/planner`).once('value');
+        const plannerVal = plannerSnapshot.val();
+        if (plannerVal) {
+            plannerData = migratePlannerData(plannerVal);
+            localStorage.setItem('gusto_planner', JSON.stringify(plannerData));
+        } else {
+            // No data in Firebase but may have local data
+            const local = localStorage.getItem('gusto_planner');
+            if (local) {
+                plannerData = migratePlannerData(JSON.parse(local));
+                db.ref(`users/${userId}/planner`).set(plannerData);
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando planificador:', error);
     }
 
     await loadRecipes();
@@ -508,14 +556,17 @@ function setupEventListeners() {
         loginScreen.style.display = 'flex';
         appDiv.style.display = 'none';
 
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             if (user) {
                 isLoggedIn = true;
                 loginScreen.style.display = 'none';
                 appDiv.style.display = 'flex';
                 document.getElementById('user-avatar').textContent = user.displayName ? user.displayName[0] : 'U';
                 document.getElementById('user-avatar-mobile').textContent = user.displayName ? user.displayName[0] : 'U';
-                loadData();
+                await loadData();
+                // Re-render planner if user navigated to it while loading
+                if (currentView === 'planner') renderWeeklyPlanner();
+                if (currentView === 'shopping') renderShoppingList();
             } else {
                 isLoggedIn = false;
                 loadingAuth.style.display = 'none';
@@ -857,7 +908,29 @@ function processImportedJson() {
     }
 }
 
+let plannerViewMode = localStorage.getItem('gusto_planner_view') || 'meals';
+
+function setPlannerView(mode) {
+    plannerViewMode = mode;
+    localStorage.setItem('gusto_planner_view', mode);
+    document.querySelectorAll('.planner-toggle-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+    renderWeeklyPlanner();
+}
+
 function renderWeeklyPlanner() {
+    document.querySelectorAll('.planner-toggle-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === plannerViewMode);
+    });
+    if (plannerViewMode === 'day') {
+        renderWeeklyPlannerByDay();
+    } else {
+        renderWeeklyPlannerByMeals();
+    }
+}
+
+function renderWeeklyPlannerByMeals() {
     const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
     plannerGrid.innerHTML = '';
 
@@ -865,29 +938,84 @@ function renderWeeklyPlanner() {
         const dayDiv = document.createElement('div');
         dayDiv.className = 'planner-day';
 
-        const plannedRecipes = (plannerData[day] || []).map(id => {
+        const dayMeals = plannerData[day] || {};
+        let mealsHtml = '';
+        MEALS.forEach(meal => {
+            const recipeIds = dayMeals[meal] || [];
+            const recipesHtml = recipeIds.map(id => {
+                const r = recipes.find(rec => rec.id === id);
+                return r ? `<div class="planner-recipe">
+                    <span>${r.name}</span>
+                    <button class="btn-icon circle-sm danger" onclick="removeFromPlanner('${day}', '${meal}', ${id})"><span class="material-icons">close</span></button>
+                </div>` : '';
+            }).join('');
+
+            mealsHtml += `
+                <div class="planner-meal-section">
+                    <h4 class="planner-meal-title">${meal}</h4>
+                    ${recipesHtml || `<p class="planner-empty-meal">—</p>`}
+                    <div class="planner-slot" onclick="openPlannerSelector('${day}', '${meal}')">
+                        <span class="material-icons">add</span>
+                        <span>Añadir</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        dayDiv.innerHTML = `<h3>${day}</h3>${mealsHtml}`;
+        plannerGrid.appendChild(dayDiv);
+    });
+}
+
+function renderWeeklyPlannerByDay() {
+    const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    plannerGrid.innerHTML = '';
+
+    days.forEach(day => {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'planner-day';
+
+        const dayMeals = plannerData[day] || {};
+        const allIds = [];
+        MEALS.forEach(meal => {
+            (dayMeals[meal] || []).forEach(id => {
+                if (!allIds.includes(id)) allIds.push(id);
+            });
+        });
+
+        const recipesHtml = allIds.map(id => {
             const r = recipes.find(rec => rec.id === id);
             return r ? `<div class="planner-recipe">
                 <span>${r.name}</span>
-                 <button class="btn-icon circle-sm danger" onclick="removeFromPlanner('${day}', ${id})"><span class="material-icons">close</span></button>
+                <button class="btn-icon circle-sm danger" onclick="removeFromPlannerAnyMeal('${day}', ${id})"><span class="material-icons">close</span></button>
             </div>` : '';
         }).join('');
 
         dayDiv.innerHTML = `
             <h3>${day}</h3>
-            ${plannedRecipes}
-            <div class="planner-slot" onclick="openPlannerSelector('${day}')">
-                 <span class="material-icons">add</span>
-                 <span>Añadir receta</span>
-             </div>
+            ${recipesHtml || `<p class="planner-empty-meal" style="margin-bottom:0.75rem;">Sin recetas</p>`}
+            <div class="planner-slot" onclick="openPlannerSelector('${day}', 'Almuerzo')">
+                <span class="material-icons">add</span>
+                <span>Añadir receta</span>
+            </div>
         `;
         plannerGrid.appendChild(dayDiv);
     });
 }
 
-function openPlannerSelector(day) {
+function removeFromPlannerAnyMeal(day, id) {
+    const meals = plannerData[day] || {};
+    MEALS.forEach(meal => {
+        meals[meal] = (meals[meal] || []).filter(rid => rid !== id);
+    });
+    savePlannerData();
+    renderWeeklyPlanner();
+}
+
+function openPlannerSelector(day, meal) {
     activePlannerDay = day;
-    document.getElementById('planner-day-name').textContent = day;
+    activePlannerMeal = meal;
+    document.getElementById('planner-day-name').textContent = plannerViewMode === 'day' ? day : day + ' — ' + meal;
     document.getElementById('planner-search-input').value = '';
     renderPlannerSelectorList();
     document.getElementById('planner-modal').style.display = 'block';
@@ -915,8 +1043,14 @@ function renderPlannerSelectorList(filter = '') {
              <span class="material-icons" style="font-size: 1.5rem;">add_circle_outline</span>
         `;
         item.onclick = () => {
-            if (!plannerData[activePlannerDay]) plannerData[activePlannerDay] = [];
-            plannerData[activePlannerDay].push(r.id);
+            if (!plannerData[activePlannerDay]) {
+                plannerData[activePlannerDay] = {};
+                MEALS.forEach(m => { plannerData[activePlannerDay][m] = []; });
+            }
+            const mealArr = plannerData[activePlannerDay][activePlannerMeal];
+            if (mealArr && !mealArr.includes(r.id)) {
+                mealArr.push(r.id);
+            }
             savePlannerData();
             renderWeeklyPlanner();
             document.getElementById('planner-modal').style.display = 'none';
@@ -925,21 +1059,35 @@ function renderPlannerSelectorList(filter = '') {
     });
 }
 
-function removeFromPlanner(day, id) {
-    plannerData[day] = (plannerData[day] || []).filter(rid => rid !== id);
+function removeFromPlanner(day, meal, id) {
+    const meals = plannerData[day] || {};
+    const arr = meals[meal] || [];
+    meals[meal] = arr.filter(rid => rid !== id);
     savePlannerData();
     renderWeeklyPlanner();
 }
 
 function savePlannerData() {
     localStorage.setItem('gusto_planner', JSON.stringify(plannerData));
+    if (auth.currentUser && db) {
+        db.ref(`users/${auth.currentUser.uid}/planner`).set(plannerData)
+            .catch(err => console.error('Error sync planificador:', err));
+    }
 }
 
 function renderShoppingList() {
     shoppingContent.innerHTML = '';
     const ingredientMap = {};
 
-    Object.values(plannerData).flat().forEach(id => {
+    const allIds = [];
+    Object.values(plannerData).forEach(dayMeals => {
+        if (!dayMeals) return;
+        MEALS.forEach(meal => {
+            (dayMeals[meal] || []).forEach(id => allIds.push(id));
+        });
+    });
+
+    allIds.forEach(id => {
         const r = recipes.find(rec => rec.id === id);
         if (r && r.ingredients) {
             r.ingredients.split('\n').filter(i => i.trim()).forEach(i => {

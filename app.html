@@ -175,6 +175,10 @@
                     <h1>Planificador Semanal</h1>
                     <p>Organiza tus comidas de la semana</p>
                 </div>
+                <div class="planner-view-toggle">
+                    <button class="planner-toggle-btn active" data-mode="meals" onclick="setPlannerView('meals')">Por comidas</button>
+                    <button class="planner-toggle-btn" data-mode="day" onclick="setPlannerView('day')">Por día</button>
+                </div>
                 <div class="planner-grid" id="planner-grid">
                     <!-- Days of week will be injected here -->
                 </div>
@@ -417,8 +421,8 @@
         </div>
     </div>
 
-    <script src="main.js"></script>
-    <script src="app.js"></script>
+    <script src="main.js?v=2"></script>
+    <script src="app.js?v=2"></script>
 </body>
 
 </html>
