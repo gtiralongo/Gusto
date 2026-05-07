@@ -26,7 +26,7 @@ async function checkUserAuth() {
     auth.onAuthStateChanged(async (user) => {
         isUserLoggedIn = !!user;
         if (user) await loadUserRecipeIds(user.uid);
-        renderCurrentPage();
+        if (allPublicRecipes.length > 0) renderCurrentPage();
     });
 }
 
@@ -40,6 +40,8 @@ async function loadUserRecipeIds(userId) {
 }
 
 async function loadAllPublicRecipes() {
+    showGridSkeleton(publicGrid, 8);
+
     if (!db) {
         // Fallback a demo si no hay DB
         const response = await fetch('./recipes.json');

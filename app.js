@@ -226,6 +226,8 @@ function renderFormTagSelector(selectedTags = []) {
 async function loadRecipes() {
     if (!db || !auth.currentUser) return;
 
+    showGridSkeleton(recipeGrid);
+
     const userId = auth.currentUser.uid;
     try {
         const snapshot = await db.ref(`users/${userId}/recipes`).once('value');
@@ -473,6 +475,15 @@ function setupEventListeners() {
         });
     });
 
+    searchGoogleBtn?.addEventListener('click', () => {
+        const name = document.getElementById('recipe-name').value.trim();
+        if (name) {
+            window.open(`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(name)}`, '_blank');
+        } else {
+            document.getElementById('recipe-name').focus();
+        }
+    });
+
     document.querySelectorAll('.manage-tags-btn').forEach(btn => {
         btn.onclick = () => {
             document.getElementById('tags-modal').style.display = 'block';
@@ -561,6 +572,7 @@ function setupEventListeners() {
                 isLoggedIn = true;
                 loginScreen.style.display = 'none';
                 appDiv.style.display = 'flex';
+                showGridSkeleton(recipeGrid);
                 document.getElementById('user-avatar').textContent = user.displayName ? user.displayName[0] : 'U';
                 document.getElementById('user-avatar-mobile').textContent = user.displayName ? user.displayName[0] : 'U';
                 await loadData();

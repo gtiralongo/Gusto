@@ -75,6 +75,16 @@ function shareRecipe(recipe) {
     }
 }
 
+function showGridSkeleton(gridElement, count = 6) {
+    if (!gridElement) return;
+    gridElement.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+        const card = document.createElement('div');
+        card.className = 'skeleton-card';
+        gridElement.appendChild(card);
+    }
+}
+
 function renderIngredientLine(text) {
     if (!text) return '';
     const parts = text.split('|').map(p => p.trim());
