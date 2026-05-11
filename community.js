@@ -42,22 +42,29 @@ async function loadUserRecipeIds(userId) {
 async function loadAllPublicRecipes() {
     showGridSkeleton(publicGrid, 8);
 
-    if (!db) {
-        // Fallback a demo si no hay DB
-        const response = await fetch('./recipes.json');
-        const data = await response.json();
-        allPublicRecipes = data;
-    } else {
+    try {
+        if (!db) throw new Error('No DB');
+        const snapshot = await db.ref('public_recipes').once('value');
+        const data = snapshot.val();
+        if (data) {
+            allPublicRecipes = Object.values(data).map(r => {
+                r.tags = r.tags || [r.category || 'Otros'];
+                return r;
+            });
+        } else {
+            throw new Error('No data');
+        }
+    } catch (error) {
+        console.error('Firebase error, loading demo recipes:', error);
         try {
-            const snapshot = await db.ref('public_recipes').once('value');
-            const data = snapshot.val();
-            if (data) {
-                allPublicRecipes = Object.values(data).map(r => {
-                    r.tags = r.tags || [r.category || 'Otros'];
-                    return r;
-                });
+            const response = await fetch('./recipes.json');
+            if (response.ok) {
+                const data = await response.json();
+                allPublicRecipes = data;
             }
-        } catch (error) { console.error(error); }
+        } catch (e) {
+            console.error('Error loading demo recipes:', e);
+        }
     }
     filteredRecipes = [...allPublicRecipes];
     renderCurrentPage();
@@ -93,7 +100,7 @@ function renderRecipeCard(recipe) {
     const alreadyOwned = isUserLoggedIn && userRecipeIds.has(recipe.id);
     
     // Solo mostrar el primer nombre del autor
-    const firstName = recipe.authorName ? recipe.authorName.split(' ')[0] : 'Anónimo';
+    const firstName = recipe.authorName ? recipe.authorName.split(' ')[0] : 'AnÃ³nimo';
 
     let buttonHtml = '';
     if (isUserLoggedIn) {
@@ -135,7 +142,7 @@ function injectInFeedAd(index) {
 
 function updatePaginationControls() {
     const totalPages = Math.ceil(filteredRecipes.length / recipesPerPage);
-    pageInfo.innerText = `Página ${currentPage} de ${totalPages || 1}`;
+    pageInfo.innerText = `PÃ¡gina ${currentPage} de ${totalPages || 1}`;
     prevPageBtn.disabled = currentPage === 1;
     nextPageBtn.disabled = currentPage >= totalPages;
 }
@@ -185,13 +192,13 @@ function viewPublicRecipe(id) {
     const tagsHtml = (recipe.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
     const alreadyOwned = isUserLoggedIn && userRecipeIds.has(recipe.id);
     
-    // Solo el primer nombre del autor para el detalle también
-    const firstName = recipe.authorName ? recipe.authorName.split(' ')[0] : 'Anónimo';
+    // Solo el primer nombre del autor para el detalle tambiÃ©n
+    const firstName = recipe.authorName ? recipe.authorName.split(' ')[0] : 'AnÃ³nimo';
 
     let actionHtml = isUserLoggedIn 
         ? (alreadyOwned ? `<span class="detail-owned-badge"><span class="material-icons">check_circle</span> Ya en tu recetario</span>` 
                         : `<button class="btn-add-to-recipes" id="detail-add-btn"><span class="material-icons">add_circle</span><span>Agregar</span></button>`)
-        : `<a href="app.html" class="btn-add-to-recipes"><span class="material-icons">login</span><span>Inicia sesión para guardar</span></a>`;
+        : `<a href="app.html" class="btn-add-to-recipes"><span class="material-icons">login</span><span>Inicia sesiÃ³n para guardar</span></a>`;
 
     publicDetails.innerHTML = `
         <div class="detail-body">
@@ -214,7 +221,7 @@ function viewPublicRecipe(id) {
                     <div class="detail-ingredients">${(recipe.ingredients || '').split('\n').filter(l => l.trim()).map(l => `<div class="ingredient-item">${renderIngredientLine(l)}</div>`).join('')}</div>
                 </div>
                 <div class="detail-section">
-                    <h3 class="detail-section-title">Preparación</h3>
+                    <h3 class="detail-section-title">PreparaciÃ³n</h3>
                     <div class="detail-steps">${(recipe.steps || recipe.preparation || '').replace(/\n/g, '<br>')}</div>
                 </div>
                 ${embedUrl ? `<div class="detail-section"><h3 class="detail-section-title">Video Tutorial</h3><div class="video-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 20px;"><iframe src="${embedUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen></iframe></div></div>` : ''}
