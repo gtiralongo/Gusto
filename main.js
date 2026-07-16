@@ -7,34 +7,10 @@ if ('serviceWorker' in navigator) {
 
 // --- PWA Install Prompt ---
 // deferredPrompt is set by inline script in <head> (captured before main.js loads)
-// or fallback: try to reconnect if inline already fired
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     window.__deferredPrompt = e;
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('install-pwa-btn')?.addEventListener('click', async () => {
-        if (window.__deferredPrompt) {
-            window.__deferredPrompt.prompt();
-            const result = await window.__deferredPrompt.userChoice;
-            console.log('PWA install result:', result.outcome);
-            window.__deferredPrompt = null;
-        }
-        hideInstallBanner();
-    });
-
-    document.getElementById('dismiss-install-btn')?.addEventListener('click', () => {
-        hideInstallBanner();
-        localStorage.setItem('gusto_pwa_dismissed', Date.now().toString());
-    });
-
-    setTimeout(() => {
-        if (window.__deferredPrompt && shouldShowInstallBanner()) {
-            showInstallBanner();
-        }
-    }, 5000);
 });
 
 window.addEventListener('appinstalled', () => {
@@ -63,6 +39,34 @@ function hideInstallBanner() {
     const banner = document.getElementById('pwa-install-banner');
     if (banner) banner.style.display = 'none';
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('install-pwa-btn')?.addEventListener('click', async () => {
+        if (window.__deferredPrompt) {
+            window.__deferredPrompt.prompt();
+            const result = await window.__deferredPrompt.userChoice;
+            console.log('PWA install result:', result.outcome);
+            if (result.outcome === 'accepted') {
+                window.__deferredPrompt = null;
+                localStorage.setItem('gusto_pwa_installed', 'true');
+            }
+        } else {
+            showToast('Abre el menú del navegador (⋮) y selecciona "Añadir a pantalla de inicio"', 'success');
+        }
+        hideInstallBanner();
+    });
+
+    document.getElementById('dismiss-install-btn')?.addEventListener('click', () => {
+        hideInstallBanner();
+        localStorage.setItem('gusto_pwa_dismissed', Date.now().toString());
+    });
+
+    setTimeout(() => {
+        if (shouldShowInstallBanner()) {
+            showInstallBanner();
+        }
+    }, 5000);
+});
 
 // --- Firebase Configuration ---
 const firebaseConfig = {
