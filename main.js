@@ -17,16 +17,12 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const prompt = () => window.__deferredPrompt?.prompt?.();
-
     document.getElementById('install-pwa-btn')?.addEventListener('click', async () => {
         if (window.__deferredPrompt) {
             window.__deferredPrompt.prompt();
             const result = await window.__deferredPrompt.userChoice;
             console.log('PWA install result:', result.outcome);
             window.__deferredPrompt = null;
-        } else {
-            prompt();
         }
         hideInstallBanner();
     });
@@ -36,10 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('gusto_pwa_dismissed', Date.now().toString());
     });
 
-    // Try to show banner after SW is ready, even if beforeinstallprompt was early
-    if (window.__deferredPrompt && shouldShowInstallBanner()) {
-        setTimeout(showInstallBanner, 5000);
-    }
+    // Wait 5s after load, then show banner if event was captured
+    setTimeout(() => {
+        if (window.__deferredPrompt && shouldShowInstallBanner()) {
+            showInstallBanner();
+        }
+    }, 5000);
+
+    // Fallback: if after 12s the event still hasn't fired, show manual-instructions banner
+    setTimeout(() => {
+        if (!window.__deferredPrompt && shouldShowInstallBanner()) {
+            showInstallBannerFallback();
+        }
+    }, 12000);
 });
 
 window.addEventListener('appinstalled', () => {
@@ -61,7 +66,25 @@ function shouldShowInstallBanner() {
 
 function showInstallBanner() {
     const banner = document.getElementById('pwa-install-banner');
-    if (banner) banner.style.display = 'block';
+    if (!banner) return;
+    banner.querySelector('.install-banner-text strong').textContent = 'Instala Gusto';
+    banner.querySelector('.install-banner-text span').textContent = 'Accede más rápido a tus recetas';
+    banner.querySelector('.install-banner-btn').textContent = 'Instalar';
+    banner.style.display = 'block';
+}
+
+function showInstallBannerFallback() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (!banner) return;
+    banner.querySelector('.install-banner-text strong').textContent = 'Instala Gusto';
+    banner.querySelector('.install-banner-text span').textContent = 'Usa "Añadir a pantalla de inicio" en el menú del navegador';
+    banner.querySelector('.install-banner-btn').textContent = 'Cómo instalarlo';
+    document.getElementById('install-pwa-btn').onclick = () => {
+        hideInstallBanner();
+        localStorage.setItem('gusto_pwa_dismissed', Date.now().toString());
+        window.open('https://support.google.com/chrome/answer/9658361', '_blank');
+    };
+    banner.style.display = 'block';
 }
 
 function hideInstallBanner() {
