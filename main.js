@@ -8,18 +8,42 @@ if ('serviceWorker' in navigator) {
 }
 
 // --- PWA Install Prompt ---
-let deferredPrompt = null;
+// deferredPrompt is set by inline script in <head> (captured before main.js loads)
+// or fallback: try to reconnect if inline already fired
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    deferredPrompt = e;
-    if (shouldShowInstallBanner()) {
+    window.__deferredPrompt = e;
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const prompt = () => window.__deferredPrompt?.prompt?.();
+
+    document.getElementById('install-pwa-btn')?.addEventListener('click', async () => {
+        if (window.__deferredPrompt) {
+            window.__deferredPrompt.prompt();
+            const result = await window.__deferredPrompt.userChoice;
+            console.log('PWA install result:', result.outcome);
+            window.__deferredPrompt = null;
+        } else {
+            prompt();
+        }
+        hideInstallBanner();
+    });
+
+    document.getElementById('dismiss-install-btn')?.addEventListener('click', () => {
+        hideInstallBanner();
+        localStorage.setItem('gusto_pwa_dismissed', Date.now().toString());
+    });
+
+    // Try to show banner after SW is ready, even if beforeinstallprompt was early
+    if (window.__deferredPrompt && shouldShowInstallBanner()) {
         setTimeout(showInstallBanner, 5000);
     }
 });
 
 window.addEventListener('appinstalled', () => {
-    deferredPrompt = null;
+    window.__deferredPrompt = null;
     hideInstallBanner();
     localStorage.setItem('gusto_pwa_installed', 'true');
 });
@@ -44,22 +68,6 @@ function hideInstallBanner() {
     const banner = document.getElementById('pwa-install-banner');
     if (banner) banner.style.display = 'none';
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('install-pwa-btn')?.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const result = await deferredPrompt.userChoice;
-        console.log('PWA install result:', result.outcome);
-        deferredPrompt = null;
-        hideInstallBanner();
-    });
-
-    document.getElementById('dismiss-install-btn')?.addEventListener('click', () => {
-        hideInstallBanner();
-        localStorage.setItem('gusto_pwa_dismissed', Date.now().toString());
-    });
-});
 
 // --- Firebase Configuration ---
 const firebaseConfig = {

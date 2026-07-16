@@ -26,6 +26,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 
+    <!-- PWA install prompt capture (early) -->
+    <script>window.__deferredPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();window.__deferredPrompt=e;console.log('beforeinstallprompt captured')});window.addEventListener('appinstalled',()=>{window.__deferredPrompt=null;localStorage.setItem('gusto_pwa_installed','true')});</script>
+
     <style>
         /* Estilos específicos para AdSense (puedes moverlos a style.css luego) */
         .ads-container {
