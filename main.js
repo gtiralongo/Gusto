@@ -1,10 +1,8 @@
-// SW Cleanup / Registration
+// SW Cleanup / Registration (register immediately, not on load)
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker registrado', reg))
-            .catch(err => console.warn('Error registrando Service Worker', err));
-    });
+    navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker registrado', reg))
+        .catch(err => console.warn('Error registrando Service Worker', err));
 }
 
 // --- PWA Install Prompt ---
@@ -32,19 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('gusto_pwa_dismissed', Date.now().toString());
     });
 
-    // Wait 5s after load, then show banner if event was captured
     setTimeout(() => {
         if (window.__deferredPrompt && shouldShowInstallBanner()) {
             showInstallBanner();
         }
     }, 5000);
-
-    // Fallback: if after 12s the event still hasn't fired, show manual-instructions banner
-    setTimeout(() => {
-        if (!window.__deferredPrompt && shouldShowInstallBanner()) {
-            showInstallBannerFallback();
-        }
-    }, 12000);
 });
 
 window.addEventListener('appinstalled', () => {
@@ -66,25 +56,7 @@ function shouldShowInstallBanner() {
 
 function showInstallBanner() {
     const banner = document.getElementById('pwa-install-banner');
-    if (!banner) return;
-    banner.querySelector('.install-banner-text strong').textContent = 'Instala Gusto';
-    banner.querySelector('.install-banner-text span').textContent = 'Accede más rápido a tus recetas';
-    banner.querySelector('.install-banner-btn').textContent = 'Instalar';
-    banner.style.display = 'block';
-}
-
-function showInstallBannerFallback() {
-    const banner = document.getElementById('pwa-install-banner');
-    if (!banner) return;
-    banner.querySelector('.install-banner-text strong').textContent = 'Instala Gusto';
-    banner.querySelector('.install-banner-text span').textContent = 'Usa "Añadir a pantalla de inicio" en el menú del navegador';
-    banner.querySelector('.install-banner-btn').textContent = 'Cómo instalarlo';
-    document.getElementById('install-pwa-btn').onclick = () => {
-        hideInstallBanner();
-        localStorage.setItem('gusto_pwa_dismissed', Date.now().toString());
-        window.open('https://support.google.com/chrome/answer/9658361', '_blank');
-    };
-    banner.style.display = 'block';
+    if (banner) banner.style.display = 'block';
 }
 
 function hideInstallBanner() {
