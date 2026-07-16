@@ -6010,3 +6010,122 @@ input:checked + .slider {
         padding: 1rem;
     }
 }
+
+/* ============================================
+   PWA Install Banner (Mobile Only)
+   ============================================ */
+.pwa-install-banner {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 400px;
+    width: calc(100% - 2rem);
+    z-index: 4500;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: pwaBannerIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pwaBannerIn {
+    from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.install-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.install-banner-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-light);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.install-banner-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.install-banner-text strong {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.install-banner-text span {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.install-banner-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    height: 36px;
+    padding: 0 1rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.install-banner-btn:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.install-banner-close {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: 0.2s;
+}
+
+.install-banner-close:hover {
+    background: var(--danger);
+    color: white;
+}
+
+@media (min-width: 769px) {
+    .pwa-install-banner {
+        display: none !important;
+    }
+}

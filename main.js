@@ -7,6 +7,60 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// --- PWA Install Prompt ---
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (shouldShowInstallBanner()) {
+        setTimeout(showInstallBanner, 5000);
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    hideInstallBanner();
+    localStorage.setItem('gusto_pwa_installed', 'true');
+});
+
+function shouldShowInstallBanner() {
+    if (window.matchMedia('(display-mode: standalone)').matches) return false;
+    if (localStorage.getItem('gusto_pwa_installed') === 'true') return false;
+    const dismissed = localStorage.getItem('gusto_pwa_dismissed');
+    if (dismissed) {
+        const daysSince = (Date.now() - parseInt(dismissed)) / (1000 * 60 * 60 * 24);
+        if (daysSince < 7) return false;
+    }
+    return true;
+}
+
+function showInstallBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.style.display = 'block';
+}
+
+function hideInstallBanner() {
+    const banner = document.getElementById('pwa-install-banner');
+    if (banner) banner.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('install-pwa-btn')?.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const result = await deferredPrompt.userChoice;
+        console.log('PWA install result:', result.outcome);
+        deferredPrompt = null;
+        hideInstallBanner();
+    });
+
+    document.getElementById('dismiss-install-btn')?.addEventListener('click', () => {
+        hideInstallBanner();
+        localStorage.setItem('gusto_pwa_dismissed', Date.now().toString());
+    });
+});
+
 // --- Firebase Configuration ---
 const firebaseConfig = {
     apiKey: "AIzaSyDJLupBIAcg3ak72yzTCojgfXUiVJb5-tA",
