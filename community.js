@@ -105,8 +105,8 @@ function renderRecipeCard(recipe) {
     let buttonHtml = '';
     if (isUserLoggedIn) {
         buttonHtml = alreadyOwned 
-            ? `<button class="btn-add-recipe owned" disabled><span class="material-icons">check_circle</span><span>En mi recetario</span></button>`
-            : `<button class="btn-add-recipe" onclick="event.stopPropagation(); addToMyRecipes(${recipe.id})"><span class="material-icons">add_circle_outline</span><span>A mi recetario</span></button>`;
+            ? `<button class="btn-add-recipe owned" disabled><span class="material-icons">check_circle</span><span>Ya en mi recetario</span></button>`
+            : `<button class="btn-add-recipe" onclick="event.stopPropagation(); addToMyRecipes(${recipe.id})"><span class="material-icons">add_circle_outline</span><span>Agregar a mi recetario</span></button>`;
     }
 
     card.innerHTML = `
@@ -196,8 +196,8 @@ function viewPublicRecipe(id) {
     const firstName = recipe.authorName ? recipe.authorName.split(' ')[0] : 'AnÃ³nimo';
 
     let actionHtml = isUserLoggedIn 
-        ? (alreadyOwned ? `<span class="detail-owned-badge"><span class="material-icons">check_circle</span> Ya en tu recetario</span>` 
-                        : `<button class="btn-add-to-recipes" id="detail-add-btn"><span class="material-icons">add_circle</span><span>Agregar</span></button>`)
+        ? (alreadyOwned ? `<span class="detail-owned-badge"><span class="material-icons">check_circle</span> Ya en mi recetario</span>` 
+                        : `<button class="btn-add-to-recipes" id="detail-add-btn"><span class="material-icons">add_circle</span><span>Agregar a mi recetario</span></button>`)
         : `<a href="app.html" class="btn-add-to-recipes"><span class="material-icons">login</span><span>Inicia sesiÃ³n para guardar</span></a>`;
 
     publicDetails.innerHTML = `

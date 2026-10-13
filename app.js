@@ -211,7 +211,7 @@ async function loadData() {
                 const recipe = JSON.parse(recipeData);
                 const newRecipe = {
                     ...recipe,
-                    id: Date.now(),
+                    id: recipe.id !== undefined ? recipe.id : Date.now(),
                     isFavorite: false,
                     isPublic: false
                 };

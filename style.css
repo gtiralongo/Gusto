@@ -2820,18 +2820,38 @@ input:checked + .slider {
     border-radius: var(--m3-shape-full);
     font: var(--m3-label-large);
     cursor: pointer;
-    transition: box-shadow var(--m3-duration-short) var(--m3-motion-standard);
+    transition: all var(--m3-duration-short) var(--m3-motion-standard);
 }
 
 .m3-landing .btn-add-recipe:hover {
     box-shadow: var(--m3-elevation-1);
     background: color-mix(in srgb, var(--m3-secondary-container) 92%, black);
+    transform: translateY(-1px);
+}
+
+.m3-landing .btn-add-recipe:active {
+    transform: translateY(0);
+    box-shadow: var(--m3-elevation-0);
+}
+
+.m3-landing .btn-add-recipe:focus-visible {
+    outline: 2px solid var(--m3-primary);
+    outline-offset: 2px;
 }
 
 .m3-landing .btn-add-recipe.owned {
-    background: rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.25);
     color: var(--accent-green);
     cursor: default;
+    opacity: 0.95;
+    box-shadow: none;
+}
+
+.m3-landing .btn-add-recipe.owned:hover,
+.m3-landing .btn-add-recipe.owned:active {
+    transform: none;
+    box-shadow: none;
+    background: rgba(16, 185, 129, 0.25);
 }
 
 .m3-app .btn-add-recipe .material-icons {
@@ -3054,11 +3074,22 @@ input:checked + .slider {
     font: var(--m3-label-large);
     text-decoration: none;
     cursor: pointer;
-    transition: box-shadow var(--m3-duration-short) var(--m3-motion-standard);
+    transition: all var(--m3-duration-short) var(--m3-motion-standard);
 }
 
 .m3-landing .btn-add-to-recipes:hover {
     box-shadow: var(--m3-elevation-1);
+    transform: translateY(-1px);
+}
+
+.m3-landing .btn-add-to-recipes:active {
+    transform: translateY(0);
+    box-shadow: var(--m3-elevation-0);
+}
+
+.m3-landing .btn-add-to-recipes:focus-visible {
+    outline: 2px solid var(--m3-primary);
+    outline-offset: 2px;
 }
 
 .m3-landing .detail-owned-badge {
@@ -5403,18 +5434,38 @@ input:checked + .slider {
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: box-shadow var(--m3-duration-short) var(--m3-motion-standard);
+    transition: all var(--m3-duration-short) var(--m3-motion-standard);
 }
 
 .m3-app .btn-add-recipe:hover {
     box-shadow: var(--m3-elevation-1);
     background: color-mix(in srgb, var(--m3-secondary-container) 92%, black);
+    transform: translateY(-1px);
+}
+
+.m3-app .btn-add-recipe:active {
+    transform: translateY(0);
+    box-shadow: var(--m3-elevation-0);
+}
+
+.m3-app .btn-add-recipe:focus-visible {
+    outline: 2px solid var(--m3-primary);
+    outline-offset: 2px;
 }
 
 .m3-app .btn-add-recipe.owned {
-    background: rgba(16, 185, 129, 0.2);
+    background: rgba(16, 185, 129, 0.25);
     color: var(--accent-green);
     cursor: default;
+    opacity: 0.95;
+    box-shadow: none;
+}
+
+.m3-app .btn-add-recipe.owned:hover,
+.m3-app .btn-add-recipe.owned:active {
+    transform: none;
+    box-shadow: none;
+    background: rgba(16, 185, 129, 0.25);
 }
 
 .m3-app .btn-add-recipe .material-icons {
@@ -5451,11 +5502,22 @@ input:checked + .slider {
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
-    transition: box-shadow var(--m3-duration-short) var(--m3-motion-standard);
+    transition: all var(--m3-duration-short) var(--m3-motion-standard);
 }
 
 .m3-app .btn-add-to-recipes:hover {
     box-shadow: var(--m3-elevation-1);
+    transform: translateY(-1px);
+}
+
+.m3-app .btn-add-to-recipes:active {
+    transform: translateY(0);
+    box-shadow: var(--m3-elevation-0);
+}
+
+.m3-app .btn-add-to-recipes:focus-visible {
+    outline: 2px solid var(--m3-primary);
+    outline-offset: 2px;
 }
 
 .m3-app .btn-add-to-recipes .material-icons {
@@ -5526,7 +5588,9 @@ input:checked + .slider {
 @media (max-width: 992px) { .teaser-card { grid-template-columns: 1fr; text-align: center; padding: 3rem 2rem; } .teaser-stats { justify-content: center; } .teaser-visual { display: none; } }
 
 /* --- FIXES --- */
-.btn-add-recipe.owned { background: rgba(16, 185, 129, 0.15) !important; color: #10b981 !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; cursor: default; }
+.btn-add-recipe.owned { background: rgba(16, 185, 129, 0.25) !important; color: #10b981 !important; border: 1px solid rgba(16, 185, 129, 0.35) !important; cursor: default; box-shadow: none !important; opacity: 0.98; }
+.btn-add-recipe.owned:hover,
+.btn-add-recipe.owned:active { transform: none !important; box-shadow: none !important; background: rgba(16, 185, 129, 0.25) !important; }
 .btn-add-recipe.owned .material-icons { color: #10b981; }
 .landing-nav .logo { display: flex; align-items: center; gap: 0.8rem; font-weight: 800; }
 .landing-nav .logo .material-icons { font-size: 2rem; color: var(--primary); }

@@ -171,12 +171,12 @@ function renderPublicRecipes() {
             if (alreadyOwned) {
                  buttonHtml = `<button class="btn-add-recipe owned" disabled>
                      <span class="material-icons">check_circle</span>
-                     <span>Ya en tu recetario</span>
+                     <span>Ya en mi recetario</span>
                  </button>`;
             } else {
                  buttonHtml = `<button class="btn-add-recipe" onclick="event.stopPropagation(); addToMyRecipes(${recipe.id})">
                      <span class="material-icons">add_circle_outline</span>
-                     <span>A mi recetario</span>
+                     <span>Agregar a mi recetario</span>
                  </button>`;
             }
         }
@@ -218,7 +218,7 @@ function viewPublicRecipe(id) {
     if (isUserLoggedIn) {
         if (alreadyOwned) {
              actionHtml = `<span class="detail-owned-badge">
-                 <span class="material-icons">check_circle</span> Ya en tu recetario
+                 <span class="material-icons">check_circle</span> Ya en mi recetario
              </span>`;
         } else {
              actionHtml = `<button class="btn-add-to-recipes" id="detail-add-btn">
