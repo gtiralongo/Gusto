@@ -863,6 +863,7 @@ function viewRecipe(id) {
     const embedUrl = getYoutubeEmbedUrl(recipe.video);
     const tagsHtml = (recipe.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
     const ingredientsHtml = (recipe.ingredients || '').split('\n').filter(l => l.trim()).map(l => `<div class="ingredient-item">${renderIngredientLine(l)}</div>`).join('');
+    const inPlanner = Object.values(plannerData).some(dayMeals => dayMeals && dayMeals['Cena'] && dayMeals['Cena'].includes(id));
 
     detailsContainer.innerHTML = `
         <div class="detail-body">
@@ -906,6 +907,7 @@ function viewRecipe(id) {
                          Eliminar Receta
                      </button>
                      ${recipe.video ? `<a href="${recipe.video}" target="_blank" class="cook-video-link"><span class="material-icons">smart_display</span> Ver en YouTube</a>` : ''}
+                     <button id="add-to-planner-btn" class="btn-secondary-sm" title="${inPlanner ? 'Quitar del plan' : 'Añadir al plan'}"><span class="material-icons">${inPlanner ? 'event_busy' : 'calendar_today'}</span> ${inPlanner ? 'En el plan' : 'Añadir al plan'}</button>
                 </div>
             </div>
         </div>
@@ -920,6 +922,11 @@ function viewRecipe(id) {
             showToast('Receta eliminada');
         }
     };
+
+    const addToPlannerBtn = document.getElementById('add-to-planner-btn');
+    if (addToPlannerBtn) {
+        addToPlannerBtn.onclick = () => openAddRecipeToPlannerPicker(recipe);
+    }
 
     const favIcon = favoriteCurrentBtn.querySelector('.material-icons');
     if (recipe.isFavorite) {
@@ -2299,6 +2306,86 @@ function openPlannerSelector(day, meal) {
     document.getElementById('planner-search-input').value = '';
     renderPlannerSelectorList();
     document.getElementById('planner-modal').style.display = 'block';
+}
+
+function openAddRecipeToPlannerPicker(recipe) {
+    const modal = document.getElementById('planner-modal');
+    const headerTitle = document.getElementById('planner-day-name');
+    const searchHeader = modal.querySelector('.planner-options-header');
+    const listContainer = document.getElementById('planner-options');
+    const modalHeader = modal.querySelector('.modal-header');
+    
+    const originalHeader = headerTitle.textContent;
+    headerTitle.textContent = 'Añadir al plan';
+    if (modalHeader) {
+        modalHeader.style.background = 'var(--glass-bg, rgba(255,255,255,0.06))';
+        modalHeader.style.borderBottom = '1px solid var(--border-color, rgba(255,255,255,0.08))';
+    }
+    
+    if (searchHeader) searchHeader.style.display = 'none';
+    
+    const days = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+    listContainer.innerHTML = `<div style="padding:1.25rem 1rem 0.5rem;"><h3 style="margin:0 0 0.5rem 0;font-size:1.25rem;font-weight:600;">${recipe.name}</h3><p style="opacity:0.75;margin:0 0 1.25rem 0;font-size:0.95rem;">Toca un día para añadir o quitar la receta de <b>Cena</b>.</p></div>`;
+    
+    days.forEach(day => {
+        const btn = document.createElement('div');
+        btn.className = 'planner-list-item';
+        btn.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:0.95rem 1.1rem;margin:0.45rem 0;background:var(--glass-bg, rgba(255,255,255,0.04));border:1px solid var(--border-color, rgba(255,255,255,0.08));border-radius:16px;cursor:pointer;transition:transform .15s ease, background .2s ease, border-color .2s ease;';
+        const already = plannerData[day] && plannerData[day]['Cena'] && plannerData[day]['Cena'].includes(recipe.id);
+        btn.innerHTML = `
+            <span class="planner-list-name" style="font-weight:600;">${day} — Cena</span>
+            <span class="material-icons" style="font-size:1.5rem;color:${already ? 'var(--primary)' : 'inherit'}">${already ? 'check_circle' : 'add_circle_outline'}</span>
+        `;
+        btn.onmouseenter = () => { btn.style.transform = 'translateY(-2px)'; btn.style.background = 'var(--glass-bg-hover, rgba(255,255,255,0.07))'; btn.style.borderColor = 'rgba(255,255,255,0.15)'; };
+        btn.onmouseleave = () => { btn.style.transform = 'translateY(0)'; btn.style.background = 'var(--glass-bg, rgba(255,255,255,0.04))'; btn.style.borderColor = 'var(--border-color, rgba(255,255,255,0.08))'; };
+        btn.onclick = () => {
+            if (!plannerData[day]) {
+                plannerData[day] = {};
+                MEALS.forEach(m => { plannerData[day][m] = []; });
+            }
+            const arr = plannerData[day]['Cena'];
+            const exists = arr.includes(recipe.id);
+            if (exists) {
+                arr.splice(arr.indexOf(recipe.id), 1);
+                showToast(`Quitado de ${day} – Cena`);
+            } else {
+                arr.push(recipe.id);
+                showToast(`Añadido a ${day} – Cena`);
+            }
+            savePlannerData();
+            renderWeeklyPlanner();
+            modal.style.display = 'none';
+            if (searchHeader) searchHeader.style.display = '';
+            headerTitle.textContent = originalHeader;
+            if (modalHeader) { modalHeader.style.background = ''; modalHeader.style.borderBottom = ''; }
+        };
+        listContainer.appendChild(btn);
+    });
+    
+    const closeBtn = modal.querySelector('.modal-header .close-modal');
+    if (closeBtn) {
+        closeBtn.style.background = 'rgba(255,255,255,0.08)';
+        closeBtn.style.border = '1px solid rgba(255,255,255,0.14)';
+        closeBtn.style.color = 'var(--on-surface, #fff)';
+        closeBtn.style.borderRadius = '50%';
+        closeBtn.style.width = '40px';
+        closeBtn.style.height = '40px';
+        closeBtn.style.display = 'flex';
+        closeBtn.style.alignItems = 'center';
+        closeBtn.style.justifyContent = 'center';
+        closeBtn.style.transition = 'background .2s ease';
+        closeBtn.onmouseenter = () => { closeBtn.style.background = 'rgba(255,255,255,0.14)'; };
+        closeBtn.onmouseleave = () => { closeBtn.style.background = 'rgba(255,255,255,0.08)'; };
+        const onClose = () => {
+            if (searchHeader) searchHeader.style.display = '';
+            headerTitle.textContent = originalHeader;
+            if (modalHeader) { modalHeader.style.background = ''; modalHeader.style.borderBottom = ''; }
+            closeBtn.removeEventListener('click', onClose);
+        };
+        closeBtn.addEventListener('click', onClose);
+    }
+    
+    modal.style.display = 'block';
 }
 
 function renderPlannerSelectorList(filter = '') {
